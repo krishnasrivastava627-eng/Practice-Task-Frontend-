@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple To‑Do List (Task 1)</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { margin-bottom: 10px; }
+    #taskInput { padding: 8px; width: 230px; }
+    #addBtn { padding: 8px 12px; cursor: pointer; }
+    ul { margin-top: 15px; padding: 0; list-style: none; }
+    li { padding: 10px; background: #f1f1f1; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .actions button { margin-left: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Task 1: Simple To‑Do List</h1>
+
+  <input type="text" id="taskInput" placeholder="Enter task...">
+  <button id="addBtn">Add Task</button>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    const input = document.getElementById("taskInput");
+    const addBtn = document.getElementById("addBtn");
+    const taskList = document.getElementById("taskList");
+
+    let tasks = JSON.parse(localStorage.getItem("simpleTasks")) || [];
+    render();
+
+    addBtn.onclick = function () {
+      const text = input.value.trim();
+      if (text === "") return;
+
+      tasks.push({ id: Date.now(), text });
+      save();
+      render();
+      input.value = "";
+    };
+
+    function render() {
+      taskList.innerHTML = "";
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>${task.text}</span>
+          <div class="actions">
+            <button onclick="editTask(${task.id})">Edit</button>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+          </div>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      save();
+      render();
+    }
+
+    function editTask(id) {
+      const newText = prompt("Edit task:");
+      if (newText === null || newText.trim() === "") return;
+      tasks = tasks.map(t => t.id === id ? { ...t, text: newText } : t);
+      save();
+      render();
+    }
+
+    function save() {
+      localStorage.setItem("simpleTasks", JSON.stringify(tasks));
+    }
+  </script>
+
+</body>
+</html>
